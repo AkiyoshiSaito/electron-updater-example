@@ -4,6 +4,7 @@
 const {app, BrowserWindow, Menu, protocol, ipcMain} = require('electron');
 const log = require('electron-log');
 const {autoUpdater} = require("electron-updater");
+const dialog = require('electron').dialog;
 
 //-------------------------------------------------------------------
 // Logging
@@ -86,7 +87,15 @@ autoUpdater.on('download-progress', (progressObj) => {
   sendStatusToWindow(log_message);
 })
 autoUpdater.on('update-downloaded', (info) => {
-  sendStatusToWindow('Update downloaded');
+  index = dialog.showMessageBox({
+     message: "アップデートあり",
+     detail: "再起動してインストールできます。",
+     buttons: ["再起動", "後で"]
+    
+  });
+  if (index === 0) {
+     autoUpdater.quitAndInstall();
+  }
 });
 app.on('ready', function() {
   // Create the Menu
@@ -110,7 +119,7 @@ app.on('window-all-closed', () => {
 // app quits.
 //-------------------------------------------------------------------
 app.on('ready', function()  {
-  autoUpdater.checkForUpdatesAndNotify();
+  autoUpdater.checkForUpdates();
 });
 
 //-------------------------------------------------------------------
